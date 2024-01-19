@@ -26,6 +26,8 @@
 package frogger;
 
 import java.awt.event.KeyEvent;
+import java.util.Random;
+
 import jig.engine.ImageResource;
 import jig.engine.PaintableCanvas;
 import jig.engine.RenderingContext;
@@ -59,12 +61,14 @@ public class Main extends StaticScreenGame {
 	private AbstractBodyLayer<MovingEntity> movingObjectsLayer;
 	private AbstractBodyLayer<MovingEntity> particleLayer;
 
+	private MovingEntityFactory roadLine[] = new MovingEntityFactory[12];
 	private MovingEntityFactory roadLine1;
 	private MovingEntityFactory roadLine2;
 	private MovingEntityFactory roadLine3;
 	private MovingEntityFactory roadLine4;
 	private MovingEntityFactory roadLine5;
 
+	private MovingEntityFactory riverLine[] = new MovingEntityFactory[12];
 	private MovingEntityFactory riverLine1;
 	private MovingEntityFactory riverLine2;
 	private MovingEntityFactory riverLine3;
@@ -127,7 +131,38 @@ public class Main extends StaticScreenGame {
 		initializeLevel(1);
 	}
 
+	public void makeMap(String roadType, int currentMapY, double speed) {
+		int theRoadCount = 0;
+		int theRiverCount = 0;
+
+		if (roadType == "water") {
+			riverLine[theRiverCount] = new MovingEntityFactory(new Vector2D(-(32 * 3), currentMapY * 32),
+					new Vector2D(speed, 0));
+			theRiverCount++;
+		} else if (roadType == "road") {
+			roadLine[theRoadCount] = new MovingEntityFactory(new Vector2D(-(32 * 3), currentMapY * 32),
+					new Vector2D(speed, 0));
+			theRoadCount++;
+		} else {
+
+		}
+	}
+
 	public void initializeLevel(int level) {
+		final String[] RoadType = { "water", "road", "grass" };
+
+		for (int q = 0; q < 10; q++) {
+			// Generate a random index to access the RoadType array
+			int randomIndex = new Random().nextInt(RoadType.length);
+
+			// Get the road type at the random index
+			String rnd = RoadType[randomIndex];
+			double randomValue = (Math.random() * 0.2) - 0.1;
+
+			makeMap(rnd, q + 2, randomValue * (level * 0.05 + 1));
+
+			System.out.println(rnd);
+		}
 
 		/*
 		 * dV is the velocity multiplier for all moving objects at the current game
@@ -135,39 +170,39 @@ public class Main extends StaticScreenGame {
 		 */
 		double dV = level * 0.05 + 1;
 
-		movingObjectsLayer.clear();
+		// movingObjectsLayer.clear();
 
 		/* River Traffic */
-		riverLine1 = new MovingEntityFactory(new Vector2D(-(32 * 3), 2 * 32),
-				new Vector2D(0.06 * dV, 0));
+		// riverLine1 = new MovingEntityFactory(new Vector2D(-(32 * 3), 2 * 32),
+		// new Vector2D(0.06 * dV, 0));
 
-		riverLine2 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 3 * 32),
-				new Vector2D(-0.04 * dV, 0));
+		// riverLine2 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 3 * 32),
+		// new Vector2D(-0.04 * dV, 0));
 
-		riverLine3 = new MovingEntityFactory(new Vector2D(-(32 * 3), 4 * 32),
-				new Vector2D(0.09 * dV, 0));
+		// riverLine3 = new MovingEntityFactory(new Vector2D(-(32 * 3), 4 * 32),
+		// new Vector2D(0.09 * dV, 0));
 
-		riverLine4 = new MovingEntityFactory(new Vector2D(-(32 * 4), 5 * 32),
-				new Vector2D(0.045 * dV, 0));
+		// riverLine4 = new MovingEntityFactory(new Vector2D(-(32 * 4), 5 * 32),
+		// new Vector2D(0.045 * dV, 0));
 
-		riverLine5 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 6 * 32),
-				new Vector2D(-0.045 * dV, 0));
+		// riverLine5 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 6 * 32),
+		// new Vector2D(-0.045 * dV, 0));
 
-		/* Road Traffic */
-		roadLine1 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 8 * 32),
-				new Vector2D(-0.1 * dV, 0));
+		// /* Road Traffic */
+		// roadLine1 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 8 * 32),
+		// new Vector2D(-0.1 * dV, 0));
 
-		roadLine2 = new MovingEntityFactory(new Vector2D(-(32 * 4), 9 * 32),
-				new Vector2D(0.08 * dV, 0));
+		// roadLine2 = new MovingEntityFactory(new Vector2D(-(32 * 4), 9 * 32),
+		// new Vector2D(0.08 * dV, 0));
 
-		roadLine3 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 10 * 32),
-				new Vector2D(-0.12 * dV, 0));
+		// roadLine3 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 10 * 32),
+		// new Vector2D(-0.12 * dV, 0));
 
-		roadLine4 = new MovingEntityFactory(new Vector2D(-(32 * 4), 11 * 32),
-				new Vector2D(0.075 * dV, 0));
+		// roadLine4 = new MovingEntityFactory(new Vector2D(-(32 * 4), 11 * 32),
+		// new Vector2D(0.075 * dV, 0));
 
-		roadLine5 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 12 * 32),
-				new Vector2D(-0.05 * dV, 0));
+		// roadLine5 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 12 * 32),
+		// new Vector2D(-0.05 * dV, 0));
 
 		goalmanager.init(level);
 		for (Goal g : goalmanager.get()) {
@@ -178,8 +213,9 @@ public class Main extends StaticScreenGame {
 		 * Build some traffic before game starts buy running MovingEntityFactories for
 		 * fews cycles
 		 */
-		for (int i = 0; i < 500; i++)
+		for (int i = 0; i < 500; i++) {
 			cycleTraffic(10);
+		}
 	}
 
 	/**
@@ -228,46 +264,58 @@ public class Main extends StaticScreenGame {
 	public void cycleTraffic(long deltaMs) {
 		MovingEntity m;
 		/* Road traffic updates */
-		roadLine1.update(deltaMs);
-		if ((m = roadLine1.buildVehicle()) != null)
-			movingObjectsLayer.add(m);
+		for (int i = 0; i < roadLine.length; i++) {
+			roadLine[i].update(deltaMs);
+			if ((m = roadLine[i].buildVehicle()) != null) {
+				movingObjectsLayer.add(m);
+			}
+		}
 
-		roadLine2.update(deltaMs);
-		if ((m = roadLine2.buildVehicle()) != null)
-			movingObjectsLayer.add(m);
+		for (int i = 0; i < riverLine.length; i++) {
+			riverLine[i].update(deltaMs);
+			if ((m = riverLine[i].buildShortLogWithTurtles(40)) != null)
+				movingObjectsLayer.add(m);
+		}
+		// roadLine1.update(deltaMs);
+		// if ((m = roadLine1.buildVehicle()) != null)
+		// movingObjectsLayer.add(m);
 
-		roadLine3.update(deltaMs);
-		if ((m = roadLine3.buildVehicle()) != null)
-			movingObjectsLayer.add(m);
+		// roadLine2.update(deltaMs);
+		// if ((m = roadLine2.buildVehicle()) != null)
+		// movingObjectsLayer.add(m);
 
-		roadLine4.update(deltaMs);
-		if ((m = roadLine4.buildVehicle()) != null)
-			movingObjectsLayer.add(m);
+		// roadLine3.update(deltaMs);
+		// if ((m = roadLine3.buildVehicle()) != null)
+		// movingObjectsLayer.add(m);
 
-		roadLine5.update(deltaMs);
-		if ((m = roadLine5.buildVehicle()) != null)
-			movingObjectsLayer.add(m);
+		// roadLine4.update(deltaMs);
+		// if ((m = roadLine4.buildVehicle()) != null)
+		// movingObjectsLayer.add(m);
+
+		// roadLine5.update(deltaMs);
+		// if ((m = roadLine5.buildVehicle()) != null)
+		// movingObjectsLayer.add(m);
 
 		/* River traffic updates */
-		riverLine1.update(deltaMs);
-		if ((m = riverLine1.buildShortLogWithTurtles(40)) != null)
-			movingObjectsLayer.add(m);
+		// riverLine1.update(deltaMs);
+		// if ((m = riverLine[0].buildShortLogWithTurtles(40)) != null)
+		// movingObjectsLayer.add(m);
 
-		riverLine2.update(deltaMs);
-		if ((m = riverLine2.buildLongLogWithCrocodile(30)) != null)
-			movingObjectsLayer.add(m);
+		// riverLine2.update(deltaMs);
+		// if ((m = riverLine2.buildLongLogWithCrocodile(30)) != null)
+		// movingObjectsLayer.add(m);
 
-		riverLine3.update(deltaMs);
-		if ((m = riverLine3.buildShortLogWithTurtles(50)) != null)
-			movingObjectsLayer.add(m);
+		// riverLine3.update(deltaMs);
+		// if ((m = riverLine3.buildShortLogWithTurtles(50)) != null)
+		// movingObjectsLayer.add(m);
 
-		riverLine4.update(deltaMs);
-		if ((m = riverLine4.buildLongLogWithCrocodile(20)) != null)
-			movingObjectsLayer.add(m);
+		// riverLine4.update(deltaMs);
+		// if ((m = riverLine4.buildLongLogWithCrocodile(20)) != null)
+		// movingObjectsLayer.add(m);
 
-		riverLine5.update(deltaMs);
-		if ((m = riverLine5.buildShortLogWithTurtles(10)) != null)
-			movingObjectsLayer.add(m);
+		// riverLine5.update(deltaMs);
+		// if ((m = riverLine5.buildShortLogWithTurtles(10)) != null)
+		// movingObjectsLayer.add(m);
 
 		// Do Wind
 		if ((m = wind.genParticles(GameLevel)) != null)
