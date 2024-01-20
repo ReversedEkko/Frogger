@@ -46,7 +46,7 @@ public class Main extends StaticScreenGame {
 	static final String RSC_PATH = "resources/";
 	static final String SPRITE_SHEET = RSC_PATH + "frogger_sprites.png";
 
-	static final int FROGGER_LIVES = 5;
+	static final int FROGGER_LIVES = 1;
 	static final int STARTING_LEVEL = 1;
 	static final int DEFAULT_LEVEL_TIME = 60;
 
@@ -61,19 +61,10 @@ public class Main extends StaticScreenGame {
 	private AbstractBodyLayer<MovingEntity> movingObjectsLayer;
 	private AbstractBodyLayer<MovingEntity> particleLayer;
 
+	// private MovingEntityFactory[] roadLine;
+	// private MovingEntityFactory[] riverLine;
 	private MovingEntityFactory roadLine[] = new MovingEntityFactory[12];
-	private MovingEntityFactory roadLine1;
-	private MovingEntityFactory roadLine2;
-	private MovingEntityFactory roadLine3;
-	private MovingEntityFactory roadLine4;
-	private MovingEntityFactory roadLine5;
-
 	private MovingEntityFactory riverLine[] = new MovingEntityFactory[12];
-	private MovingEntityFactory riverLine1;
-	private MovingEntityFactory riverLine2;
-	private MovingEntityFactory riverLine3;
-	private MovingEntityFactory riverLine4;
-	private MovingEntityFactory riverLine5;
 
 	private ImageBackgroundLayer backgroundLayer;
 
@@ -131,78 +122,71 @@ public class Main extends StaticScreenGame {
 		initializeLevel(1);
 	}
 
-	public void makeMap(String roadType, int currentMapY, double speed) {
-		int theRoadCount = 0;
-		int theRiverCount = 0;
+	public void makeMap(String roadType, int currentMapY, double speed, int pos, int roadCount, int theRiverCount) {
 
-		if (roadType == "water") {
-			riverLine[theRiverCount] = new MovingEntityFactory(new Vector2D(-(32 * 3), currentMapY * 32),
+		if ("water".equals(roadType)) {
+			riverLine[theRiverCount] = new MovingEntityFactory(new Vector2D((pos), currentMapY * 32),
 					new Vector2D(speed, 0));
-			theRiverCount++;
-		} else if (roadType == "road") {
-			roadLine[theRoadCount] = new MovingEntityFactory(new Vector2D(-(32 * 3), currentMapY * 32),
-					new Vector2D(speed, 0));
-			theRoadCount++;
-		} else {
 
+		} else if ("road".equals(roadType)) {
+			roadLine[roadCount] = new MovingEntityFactory(new Vector2D((pos), currentMapY * 32),
+					new Vector2D(speed, 0));
+		}
+
+		for (int x = roadCount + 1; x < roadLine.length; x++) {
+			roadLine[x] = null;
+		}
+		for (int x = theRiverCount + 1; x < riverLine.length; x++) {
+			riverLine[x] = null;
 		}
 	}
 
 	public void initializeLevel(int level) {
 		final String[] RoadType = { "water", "road", "grass" };
 
-		for (int q = 0; q < 10; q++) {
+		int roadcountpremium = 0;
+		int theRiverCount = 0;
+
+		for (int q = 0; q < 11; q++) {
+			int vectorPos = (-(32 * 3));
 			// Generate a random index to access the RoadType array
 			int randomIndex = new Random().nextInt(RoadType.length);
 
 			// Get the road type at the random index
 			String rnd = RoadType[randomIndex];
-			double randomValue = (Math.random() * 0.2) - 0.1;
+			double randomValue = 0;
 
-			makeMap(rnd, q + 2, randomValue * (level * 0.05 + 1));
+			do {
+				randomValue = (Math.random() * 0.2) - 0.1;
+			} while ((randomValue > 0.02) && (randomValue < -.02));
+
+			if (randomValue < 0) {
+				vectorPos = Main.WORLD_WIDTH;
+			}
+
+			switch (rnd) {
+				case "water":
+					theRiverCount++;
+					break;
+
+				case "road":
+					roadcountpremium++;
+					break;
+
+				default:
+					break;
+			}
+
+			// the move/creates the objects factory(each row of the map is a factory)
+			makeMap(rnd, q + 2, randomValue * (level * 0.05 + 1), vectorPos, roadcountpremium, theRiverCount);
 
 			System.out.println(rnd);
 		}
 
-		/*
-		 * dV is the velocity multiplier for all moving objects at the current game
-		 * level
-		 */
-		double dV = level * 0.05 + 1;
+		System.out.println("end");
+		System.out.println();
 
-		// movingObjectsLayer.clear();
-
-		/* River Traffic */
-		// riverLine1 = new MovingEntityFactory(new Vector2D(-(32 * 3), 2 * 32),
-		// new Vector2D(0.06 * dV, 0));
-
-		// riverLine2 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 3 * 32),
-		// new Vector2D(-0.04 * dV, 0));
-
-		// riverLine3 = new MovingEntityFactory(new Vector2D(-(32 * 3), 4 * 32),
-		// new Vector2D(0.09 * dV, 0));
-
-		// riverLine4 = new MovingEntityFactory(new Vector2D(-(32 * 4), 5 * 32),
-		// new Vector2D(0.045 * dV, 0));
-
-		// riverLine5 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 6 * 32),
-		// new Vector2D(-0.045 * dV, 0));
-
-		// /* Road Traffic */
-		// roadLine1 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 8 * 32),
-		// new Vector2D(-0.1 * dV, 0));
-
-		// roadLine2 = new MovingEntityFactory(new Vector2D(-(32 * 4), 9 * 32),
-		// new Vector2D(0.08 * dV, 0));
-
-		// roadLine3 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 10 * 32),
-		// new Vector2D(-0.12 * dV, 0));
-
-		// roadLine4 = new MovingEntityFactory(new Vector2D(-(32 * 4), 11 * 32),
-		// new Vector2D(0.075 * dV, 0));
-
-		// roadLine5 = new MovingEntityFactory(new Vector2D(Main.WORLD_WIDTH, 12 * 32),
-		// new Vector2D(-0.05 * dV, 0));
+		movingObjectsLayer.clear();
 
 		goalmanager.init(level);
 		for (Goal g : goalmanager.get()) {
@@ -219,63 +203,21 @@ public class Main extends StaticScreenGame {
 	}
 
 	/**
-	 * Generate the map for the given level
-	 * 
-	 * @param level The current level
-	 */
-	public void generateMap(int level) {
-		double dV = level * 0.05 + 1;
-
-		// Generate river traffic
-		for (int i = 1; i <= 5; i++) {
-			MovingEntityFactory riverLine = new MovingEntityFactory(
-					new Vector2D((i % 2 == 0) ? -(32 * 3) : Main.WORLD_WIDTH,
-							i * 2 * 32),
-					new Vector2D(((i % 2 == 0) ? 1 : -1) * 0.05 * dV, 0));
-
-			if (i % 2 == 0)
-				movingObjectsLayer.add(riverLine.buildLongLogWithCrocodile(30));
-			else
-				movingObjectsLayer.add(riverLine.buildShortLogWithTurtles(40));
-		}
-
-		// Generate road traffic
-		for (int i = 1; i <= 5; i++) {
-			MovingEntityFactory roadLine = new MovingEntityFactory(
-					new Vector2D((i % 2 == 0) ? Main.WORLD_WIDTH : -(32 * 4),
-							(i + 7) * 32),
-					new Vector2D(((i % 2 == 0) ? -1 : 1) * 0.1 * dV, 0));
-
-			movingObjectsLayer.add(roadLine.buildVehicle());
-		}
-
-		// Initialize goals
-		goalmanager.init(level);
-		for (Goal g : goalmanager.get()) {
-			movingObjectsLayer.add(g);
-		}
-	}
-
-	/**
 	 * Populate movingObjectLayer with a cycle of cars/trucks, moving tree logs, etc
 	 * 
 	 * @param deltaMs
 	 */
 	public void cycleTraffic(long deltaMs) {
 		MovingEntity m;
-		/* Road traffic updates */
-		for (int i = 0; i < roadLine.length; i++) {
-			roadLine[i].update(deltaMs);
-			if ((m = roadLine[i].buildVehicle()) != null) {
-				movingObjectsLayer.add(m);
+		for (int y = 0; y < roadLine.length; y++) {
+			if (roadLine[y] != null) {
+				roadLine[y].update(deltaMs);
+				if ((m = roadLine[y].buildVehicle()) != null) {
+					movingObjectsLayer.add(m);
+				}
 			}
 		}
-
-		for (int i = 0; i < riverLine.length; i++) {
-			riverLine[i].update(deltaMs);
-			if ((m = riverLine[i].buildShortLogWithTurtles(40)) != null)
-				movingObjectsLayer.add(m);
-		}
+		/* Road traffic updates */
 		// roadLine1.update(deltaMs);
 		// if ((m = roadLine1.buildVehicle()) != null)
 		// movingObjectsLayer.add(m);
@@ -297,9 +239,14 @@ public class Main extends StaticScreenGame {
 		// movingObjectsLayer.add(m);
 
 		/* River traffic updates */
-		// riverLine1.update(deltaMs);
-		// if ((m = riverLine[0].buildShortLogWithTurtles(40)) != null)
-		// movingObjectsLayer.add(m);
+		for (int x = 0; x < riverLine.length; x++) {
+			if (riverLine[x] != null) {
+				riverLine[x].update(deltaMs);
+				if ((m = riverLine[x].buildLongLogWithCrocodile(40)) != null) {
+					movingObjectsLayer.add(m);
+				}
+			}
+		}
 
 		// riverLine2.update(deltaMs);
 		// if ((m = riverLine2.buildLongLogWithCrocodile(30)) != null)
@@ -513,6 +460,7 @@ public class Main extends StaticScreenGame {
 				break;
 
 			case GAME_OVER:
+				new Score(GameScore);
 			case GAME_INSTRUCTIONS:
 			case GAME_INTRO:
 				backgroundLayer.render(rc);
@@ -523,6 +471,7 @@ public class Main extends StaticScreenGame {
 	}
 
 	public static void main(String[] args) {
+
 		Main f = new Main();
 		f.run();
 	}
