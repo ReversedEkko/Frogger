@@ -113,6 +113,13 @@ public class FroggerUI implements ViewableLayer {
 			gameOver.get(0).render(rc,
 					AffineTransform.getTranslateInstance(
 							(Main.WORLD_WIDTH - gameOver.get(0).getWidth()) / 2, 150));
+			fontBlack.render("Final Score: " + game.GameScore, rc,
+					AffineTransform.getTranslateInstance(270, 200));
+
+			if ((game.GameScore + 1) > score.readScore()) {
+				fontBlack.render("New Topscore", rc,
+						AffineTransform.getTranslateInstance(270, 230));
+			}
 			return;
 		}
 

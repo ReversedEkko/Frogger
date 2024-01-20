@@ -37,6 +37,12 @@ import jig.engine.hli.ImageBackgroundLayer;
 import jig.engine.hli.StaticScreenGame;
 import jig.engine.physics.AbstractBodyLayer;
 import jig.engine.util.Vector2D;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Main extends StaticScreenGame {
 	static final int WORLD_WIDTH = (20 * 32);
@@ -123,14 +129,33 @@ public class Main extends StaticScreenGame {
 	}
 
 	public void makeMap(String roadType, int currentMapY, double speed, int pos, int roadCount, int theRiverCount) {
-
 		if ("water".equals(roadType)) {
-			riverLine[theRiverCount] = new MovingEntityFactory(new Vector2D((pos), currentMapY * 32),
+			riverLine[theRiverCount] = new MovingEntityFactory(new Vector2D(pos, currentMapY * 32),
 					new Vector2D(speed, 0));
+
+			try {
+				// Append the current map Y to "CurrentRiverPositions.txt"
+				FileWriter write = new FileWriter("CurrentRiverPositions.txt", true);
+				write.write(currentMapY + "\n");
+				write.close();
+			} catch (IOException e) {
+				System.out.println("An error occurred while saving the river positions.");
+				e.printStackTrace();
+			}
 
 		} else if ("road".equals(roadType)) {
-			roadLine[roadCount] = new MovingEntityFactory(new Vector2D((pos), currentMapY * 32),
+			roadLine[roadCount] = new MovingEntityFactory(new Vector2D(pos, currentMapY * 32),
 					new Vector2D(speed, 0));
+
+			try {
+				// Append the current map Y to "CurrentRoadPositions.txt"
+				FileWriter write = new FileWriter("CurrentRoadPositions.txt", true);
+				write.write(currentMapY + "\n");
+				write.close();
+			} catch (IOException e) {
+				System.out.println("An error occurred while saving the road positions.");
+				e.printStackTrace();
+			}
 		}
 
 		for (int x = roadCount + 1; x < roadLine.length; x++) {
@@ -139,10 +164,26 @@ public class Main extends StaticScreenGame {
 		for (int x = theRiverCount + 1; x < riverLine.length; x++) {
 			riverLine[x] = null;
 		}
+
 	}
 
 	public void initializeLevel(int level) {
 		final String[] RoadType = { "water", "road", "grass" };
+
+		// clears info from temp storage
+		File tempRiverPos = new File("CurrentRiverPositions.txt");
+		if (tempRiverPos.delete()) {
+			System.out.println("Deleted the file: " + tempRiverPos.getName());
+		} else {
+			System.out.println("Failed to delete the file.");
+		}
+
+		File tempRoadPos = new File("CurrentRoadPositions.txt");
+		if (tempRoadPos.delete()) {
+			System.out.println("Deleted the file: " + tempRoadPos.getName());
+		} else {
+			System.out.println("Failed to delete the file.");
+		}
 
 		int roadcountpremium = 0;
 		int theRiverCount = 0;
@@ -209,6 +250,7 @@ public class Main extends StaticScreenGame {
 	 */
 	public void cycleTraffic(long deltaMs) {
 		MovingEntity m;
+		/* Road traffic updates */
 		for (int y = 0; y < roadLine.length; y++) {
 			if (roadLine[y] != null) {
 				roadLine[y].update(deltaMs);
@@ -217,26 +259,6 @@ public class Main extends StaticScreenGame {
 				}
 			}
 		}
-		/* Road traffic updates */
-		// roadLine1.update(deltaMs);
-		// if ((m = roadLine1.buildVehicle()) != null)
-		// movingObjectsLayer.add(m);
-
-		// roadLine2.update(deltaMs);
-		// if ((m = roadLine2.buildVehicle()) != null)
-		// movingObjectsLayer.add(m);
-
-		// roadLine3.update(deltaMs);
-		// if ((m = roadLine3.buildVehicle()) != null)
-		// movingObjectsLayer.add(m);
-
-		// roadLine4.update(deltaMs);
-		// if ((m = roadLine4.buildVehicle()) != null)
-		// movingObjectsLayer.add(m);
-
-		// roadLine5.update(deltaMs);
-		// if ((m = roadLine5.buildVehicle()) != null)
-		// movingObjectsLayer.add(m);
 
 		/* River traffic updates */
 		for (int x = 0; x < riverLine.length; x++) {
@@ -247,22 +269,6 @@ public class Main extends StaticScreenGame {
 				}
 			}
 		}
-
-		// riverLine2.update(deltaMs);
-		// if ((m = riverLine2.buildLongLogWithCrocodile(30)) != null)
-		// movingObjectsLayer.add(m);
-
-		// riverLine3.update(deltaMs);
-		// if ((m = riverLine3.buildShortLogWithTurtles(50)) != null)
-		// movingObjectsLayer.add(m);
-
-		// riverLine4.update(deltaMs);
-		// if ((m = riverLine4.buildLongLogWithCrocodile(20)) != null)
-		// movingObjectsLayer.add(m);
-
-		// riverLine5.update(deltaMs);
-		// if ((m = riverLine5.buildShortLogWithTurtles(10)) != null)
-		// movingObjectsLayer.add(m);
 
 		// Do Wind
 		if ((m = wind.genParticles(GameLevel)) != null)
@@ -283,16 +289,26 @@ public class Main extends StaticScreenGame {
 		keyboard.poll();
 
 		boolean keyReleased = false;
-		boolean downPressed = keyboard.isPressed(KeyEvent.VK_DOWN);
-		boolean upPressed = keyboard.isPressed(KeyEvent.VK_UP);
-		boolean leftPressed = keyboard.isPressed(KeyEvent.VK_LEFT);
-		boolean rightPressed = keyboard.isPressed(KeyEvent.VK_RIGHT);
+		boolean downPressed;
+		boolean upPressed;
+		boolean leftPressed;
+		boolean rightPressed;
+
+		downPressed = keyboard.isPressed(KeyEvent.VK_S) || keyboard.isPressed(KeyEvent.VK_DOWN);
+
+		upPressed = keyboard.isPressed(KeyEvent.VK_W) || keyboard.isPressed(KeyEvent.VK_UP);
+
+		leftPressed = keyboard.isPressed(KeyEvent.VK_A) || keyboard.isPressed(KeyEvent.VK_LEFT);
+
+		rightPressed = keyboard.isPressed(KeyEvent.VK_D) || keyboard.isPressed(KeyEvent.VK_RIGHT);
 
 		// Enable/Disable cheating
-		if (keyboard.isPressed(KeyEvent.VK_C))
+		if (keyboard.isPressed(KeyEvent.VK_C)) {
 			frog.cheating = true;
-		if (keyboard.isPressed(KeyEvent.VK_V))
+		}
+		if (keyboard.isPressed(KeyEvent.VK_V)) {
 			frog.cheating = false;
+		}
 		if (keyboard.isPressed(KeyEvent.VK_0)) {
 			GameLevel = 10;
 			initializeLevel(GameLevel);
@@ -303,11 +319,13 @@ public class Main extends StaticScreenGame {
 		 * It registers a key press, and ignores all other key strokes
 		 * until the first key has been released
 		 */
-		if (downPressed || upPressed || leftPressed || rightPressed)
+		if (downPressed || upPressed || leftPressed || rightPressed) {
 			keyPressed = true;
-		else if (keyPressed)
-			keyReleased = true;
+		}
 
+		else if (keyPressed) {
+			keyReleased = true;
+		}
 		if (listenInput) {
 			if (downPressed)
 				frog.moveDown();

@@ -35,7 +35,6 @@ public class Score {
 
             // Print each line of the file
             int line = Integer.parseInt(bufferedReader.readLine());
-            System.out.println("Reading scores from file:");
 
             // Close the BufferedReader
             bufferedReader.close();
