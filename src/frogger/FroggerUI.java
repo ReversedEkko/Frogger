@@ -30,6 +30,7 @@ import java.awt.Font;
 import java.awt.geom.AffineTransform;
 import java.util.List;
 
+import javafx.scene.input.KeyEvent;
 import jig.engine.FontResource;
 import jig.engine.ImageResource;
 import jig.engine.RenderingContext;
@@ -51,6 +52,8 @@ public class FroggerUI implements ViewableLayer {
 			Main.SPRITE_SHEET + "#splash");
 	List<ImageResource> instructions = ResourceFactory.getFactory().getFrames(
 			Main.SPRITE_SHEET + "#help");
+	List<ImageResource> skins = ResourceFactory.getFactory().getFrames(
+			Main.SKINS_SHEET);
 
 	FontResource font = ResourceFactory.getFactory().getFontResource(
 			new Font("Sans Serif", Font.BOLD, 14), Color.white, null);
@@ -67,13 +70,13 @@ public class FroggerUI implements ViewableLayer {
 	public void render(RenderingContext rc) {
 
 		font.render("Time: " + game.levelTimer, rc,
-				AffineTransform.getTranslateInstance(180, 7));
+				AffineTransform.getTranslateInstance(380, 7));
 
 		font.render("Score: " + game.GameScore, rc,
-				AffineTransform.getTranslateInstance(310, 7));
+				AffineTransform.getTranslateInstance(510, 7));
 
 		font.render("Top Score: " + score.readScore(), rc,
-				AffineTransform.getTranslateInstance(400, 7));
+				AffineTransform.getTranslateInstance(600, 7));
 
 		if (game.GameLives > 0) {
 			int dx = 0;
@@ -109,16 +112,23 @@ public class FroggerUI implements ViewableLayer {
 			return;
 		}
 
+		if (game.GameState == Main.SKIN_Selection) {
+			skins.get(0).render(rc,
+					AffineTransform.getTranslateInstance(
+							(Main.WORLD_WIDTH - skins.get(0).getWidth()) / 2, 100));
+			return;
+		}
+
 		if (game.GameState == Main.GAME_OVER) {
 			gameOver.get(0).render(rc,
 					AffineTransform.getTranslateInstance(
 							(Main.WORLD_WIDTH - gameOver.get(0).getWidth()) / 2, 150));
 			fontBlack.render("Final Score: " + game.GameScore, rc,
-					AffineTransform.getTranslateInstance(270, 200));
+					AffineTransform.getTranslateInstance(435, 200));
 
 			if ((game.GameScore + 1) > score.readScore()) {
 				fontBlack.render("New Topscore", rc,
-						AffineTransform.getTranslateInstance(270, 230));
+						AffineTransform.getTranslateInstance(430, 230));
 			}
 			return;
 		}

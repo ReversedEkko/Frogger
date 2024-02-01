@@ -5,6 +5,11 @@
         <framesrc>frogger.xml</framesrc>
     </spritesheet>
 
+    <spritesheet>
+        <imagesrc>frogger_skins.png</imagesrc>
+        <framesrc>frogger_skins.xml</framesrc>
+    </spritesheet>
+
     <audioclip>
     	<src>jump.wav</src></audioclip><audioclip>
     	<src>frog_die.ogg</src></audioclip><audioclip>

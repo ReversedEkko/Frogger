@@ -69,7 +69,7 @@ public class Frogger extends MovingEntity {
 	 * Build frogger!
 	 */
 	public Frogger(Main g) {
-		super(Main.SPRITE_SHEET + "#frog");
+		super(Main.SKINS_SHEET + Main.CurrentSkin);
 		game = g;
 		resetFrog();
 		collisionObjects.add(new CollisionObject(position));
@@ -85,6 +85,7 @@ public class Frogger extends MovingEntity {
 		followObject = null;
 		position = Main.FROGGER_START;
 		game.levelTimer = Main.DEFAULT_LEVEL_TIME;
+
 	}
 
 	/**
@@ -287,10 +288,15 @@ public class Frogger extends MovingEntity {
 			game.GameScore += game.levelTimer;
 			if (g.isBonus) {
 				AudioEfx.bonus.play(0.2);
-				game.GameLives++;
+				game.GameScore += 50;
 			}
-			g.reached();
-			resetFrog();
+			if (Main.twoPlayer) {
+
+			} else {
+				g.reached();
+				resetFrog();
+			}
+
 		} else {
 			setPosition(g.getPosition());
 		}

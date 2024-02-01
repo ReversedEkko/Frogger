@@ -94,11 +94,18 @@
 	<rows>2</rows>
 	</frameset>
     <frameset>
-        <name>background</name>
-        <top>0</top>
+        <name>road</name>
+        <top>288</top>
         <left>384</left>
-        <width>416</width>
-        <height>448</height>
+        <width>32</width>
+        <height>32</height>
+    </frameset>
+    <frameset>
+        <name>river</name>
+        <top>180</top>
+        <left>384</left>
+        <width>32</width>
+        <height>32</height>
     </frameset>
     <frameset>
         <name>white_dot</name>

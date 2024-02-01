@@ -61,23 +61,9 @@ public class GoalManager {
 	public void init(final int level) {
 
 		goals.clear();
-		int randomNumber = r.nextInt(6) + 5;
+		int randomNumber = r.nextInt(6) + 13;
 
 		goals.add(new Goal(new Vector2D(randomNumber * 32, 32)));
-		// if (level < 3) {
-		// switch (level) {
-		// case 1:
-
-		// goals.add(new Goal(new Vector2D(7 * 32, 32)));
-		// break;
-		// case 2:
-		// default:
-		// goals.add(new Goal(new Vector2D(5 * 32, 32)));
-		// goals.add(new Goal(new Vector2D(7 * 32, 32)));
-		// goals.add(new Goal(new Vector2D(3 * 32, 32)));
-		// goals.add(new Goal(new Vector2D(9 * 32, 32)));
-		// break;
-		// }
 		return;
 		// }
 

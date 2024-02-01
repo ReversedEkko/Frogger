@@ -1,0 +1,33 @@
+<spriteset>
+    <author>Phil Jiang</author>
+    <name>Frogger Skins</name>
+    <type>image/png</type>
+    <width>800</width>
+    <height>600</height>
+
+    <frameset>
+        <name>frog_pink</name>
+        <top>0</top>
+        <left>0</left>
+        <width>32</width>
+        <height>32</height>
+        <columns>10</columns>
+    </frameset>
+
+    <frameset>
+        <name>frog_normal</name>
+        <top>32</top>
+        <left>0</left>
+        <width>32</width>
+        <height>32</height>
+        <columns>10</columns>
+    </frameset>
+    <frameset>
+        <name>frog_fish</name>
+        <top>64</top>
+        <left>0</left>
+        <width>32</width>
+        <height>32</height>
+        <columns>10</columns>
+    </frameset>
+</spriteset>
