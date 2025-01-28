@@ -1,3 +1,13 @@
+Final Capstone project,
+
+Modify the following program and add 5 new features, "features" are dtermined by the instrutor.
+
+Features added,
+"Skins" - frog has different sprites which can be chosen
+"Local multiplayer" - an option for another player using different controls
+"Randomize map"
+"Difficulty"
+
 ```
 /**
  * Copyright (c) 2009 Vitaliy Pavlenko
